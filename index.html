@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Noche de Vellmoor</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="menu" class="overlay">
+  <div class="panel">
+    <h1>Noche de Vellmoor</h1>
+    <p class="sub">La luna sangra sobre la ciudad. Las bestias salen de la niebla,<br>y a veces la realidad se desgarra. Avanzá nivel por nivel o salí de cacería libre.</p>
+    <button id="startBtn" class="btn">Entrar al refugio</button>
+    <div class="controls">
+      <div><b>WASD / Flechas</b> moverse</div>
+      <div><b>Disparo y cuerpo a cuerpo</b> automáticos</div>
+      <div><b>Espacio</b> transformar el arma</div>
+      <div><b>Shift</b> esquivar (gasta aguante)</div>
+      <div><b>Q</b> vial curativo · <b>R</b> balas de sangre</div>
+      <div><b>E</b> arte oculta (gasta balas)</div>
+      <div><b>F</b> usar objeto · <b>C</b> cambiar objeto</div>
+      <div><b>T</b> tienda del velo (paga con Lucidez)</div>
+      <div><b>1 / 2 / 3</b> elegir mejora</div>
+      <div><b>P / Esc</b> pausa &nbsp;·&nbsp; <b>M</b> sonido</div>
+    </div>
+  </div>
+</div>
+
+<div id="hub" class="overlay hidden">
+  <div class="panel wide hub">
+    <h2>El Refugio del Farolero</h2>
+    <p class="sub hub-sub">La Relojera da cuerda a sus relojes. "Gastá bien tu esencia, cazador. La noche no perdona."</p>
+    <div id="hubRes" class="hub-res"></div>
+    <div class="hub-tabs">
+      <button data-tab="attrs" class="tab">Atributos</button>
+      <button data-tab="weapons" class="tab">Armas</button>
+      <button data-tab="prov" class="tab">Provisiones</button>
+      <button data-tab="normal" class="tab">Modo normal</button>
+      <button data-tab="log" class="tab">Registro</button>
+    </div>
+    <div id="hubBody" class="hub-body"></div>
+    <div class="over-btns">
+      <button id="normalBtn" class="btn">Modo normal · nivel 1</button>
+      <button id="huntBtn" class="btn">Salir de cacería</button>
+    </div>
+    <p class="hint">Modo normal: niveles con jefes cada 6 · Salir de cacería: modo libre de 10 minutos · Enter: modo normal</p>
+  </div>
+</div>
+
+<div id="levelup" class="overlay hidden">
+  <div class="panel wide">
+    <h2 id="luTitle">El eco de la luna te fortalece</h2>
+    <div id="choices"></div>
+    <p class="hint" id="luHint">Elegí con clic o con las teclas 1 / 2 / 3</p>
+  </div>
+</div>
+
+<div id="pause" class="overlay hidden">
+  <div class="panel">
+    <h2>Pausa</h2>
+    <button id="resumeBtn" class="btn">Continuar</button>
+    <button id="quitBtn" class="btn" style="margin-top:10px">Abandonar la cacería</button>
+    <p class="hint">P / Esc para volver</p>
+  </div>
+</div>
+
+<div id="over" class="overlay hidden">
+  <div class="panel">
+    <h1 id="overTitle">Caíste en la noche</h1>
+    <div id="stats"></div>
+    <div class="over-btns">
+      <button id="hubBtn" class="btn">Volver al refugio</button>
+      <button id="restartBtn" class="btn">Cazar de nuevo</button>
+    </div>
+    <p class="hint">Enter: refugio · R: cazar de nuevo</p>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
