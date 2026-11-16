@@ -31,6 +31,71 @@ function hash(x, y) {
 function angDiff(a, b) { let d = a - b; while (d > Math.PI) d -= TAU; while (d < -Math.PI) d += TAU; return d; }
 function fmtTime(t) { const m = Math.floor(t / 60), s = Math.floor(t % 60); return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0'); }
 
+// --- Pixel art gótico: cada figura se redibuja sobre una grilla de pixeles con una paleta limitada
+// (negros, hueso, sangre, oro, acero lunar, arcano), tramado ordenado, luz de luna en los bordes
+// superiores, sombra en los inferiores y contorno de un pixel.
+const PIXEL_PALETTE = [
+  '#07040a', '#140e16', '#221824', '#2e2430', '#3e3440', '#54484e', '#6e6266', '#8e8484', '#b8aea4', '#e2d8c8',
+  '#2a0a10', '#4e1018', '#7a1a22', '#a8282c', '#d4483c',
+  '#2a1a10', '#4a3018', '#6e4a24', '#9a6e34', '#c9a35a', '#f0d890',
+  '#14202a', '#24384a', '#4a6a82', '#9ac0d8',
+  '#1c1028', '#3a2050', '#6a3a8a', '#b07cff',
+  '#1a2a14', '#3a5a2a', '#7aa84a',
+  '#ff9a3c', '#ffd27a',
+].map(h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]);
+const PAL_CACHE = new Map();
+function nearestPal(r, g, b) {
+  const key = (r >> 3) << 10 | (g >> 3) << 5 | (b >> 3);
+  let hit = PAL_CACHE.get(key);
+  if (hit) return hit;
+  let best = PIXEL_PALETTE[0], bd = Infinity;
+  for (const c of PIXEL_PALETTE) {
+    const dr = r - c[0], dg = g - c[1], db = b - c[2], d = dr * dr * 0.3 + dg * dg * 0.59 + db * db * 0.11;
+    if (d < bd) { bd = d; best = c; }
+  }
+  PAL_CACHE.set(key, best);
+  return best;
+}
+const BAYER4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+function pixelArt(src, px = 1.6) {
+  const logical = src.width / 2, n = Math.max(10, Math.round(logical / px));
+  const c = document.createElement('canvas'); c.width = c.height = n;
+  const g = c.getContext('2d');
+  g.imageSmoothingEnabled = true; g.drawImage(src, 0, 0, n, n);
+  const img = g.getImageData(0, 0, n, n), d = img.data;
+  const solid = new Uint8Array(n * n);
+  // 1) silueta nítida + paleta limitada con tramado
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+    const i = (y * n + x) * 4;
+    if (d[i + 3] < 110) { d[i + 3] = 0; continue; }
+    const t = (BAYER4[(y & 3) * 4 + (x & 3)] / 16 - 0.5) * 22;
+    const [r, gg, b] = nearestPal(clamp(d[i] + t, 0, 255), clamp(d[i + 1] + t, 0, 255), clamp(d[i + 2] + t, 0, 255));
+    d[i] = r; d[i + 1] = gg; d[i + 2] = b; d[i + 3] = 255; solid[y * n + x] = 1;
+  }
+  const at = (x, y) => x >= 0 && y >= 0 && x < n && y < n && solid[y * n + x];
+  const out = new Uint8ClampedArray(d);
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+    const i = (y * n + x) * 4;
+    if (solid[y * n + x]) {
+      // 2) luz de luna arriba a la izquierda, sombra abajo a la derecha
+      const lit = !at(x, y - 1) || !at(x - 1, y), shade = !at(x, y + 1) || !at(x + 1, y);
+      let r = d[i], gg = d[i + 1], b = d[i + 2];
+      if (lit && !shade) { r = r + (226 - r) * 0.38; gg = gg + (222 - gg) * 0.38; b = b + (240 - b) * 0.42; }
+      else if (shade && !lit) { r *= 0.62; gg *= 0.62; b *= 0.7; }
+      const q = nearestPal(r, gg, b); out[i] = q[0]; out[i + 1] = q[1]; out[i + 2] = q[2];
+    } else if (at(x - 1, y) || at(x + 1, y) || at(x, y - 1) || at(x, y + 1)) {
+      // 3) contorno de un pixel
+      out[i] = 7; out[i + 1] = 4; out[i + 2] = 10; out[i + 3] = 255;
+    }
+  }
+  img.data.set(out); g.putImageData(img, 0, 0);
+  c.pixel = true;
+  return c;
+}
+// dibuja un sprite de pixel art sin suavizar (pixeles nítidos)
+function crisp(fn) { const s = ctx.imageSmoothingEnabled; ctx.imageSmoothingEnabled = false; fn(); ctx.imageSmoothingEnabled = s; }
+
+
 const RUN_LENGTH = 600;      // 10 minutos hasta el amanecer
 const MAX_ENEMIES = 320;
 
@@ -597,7 +662,7 @@ function tintOf(src) {
   return c;
 }
 const FLASH = {}, TINT = {};
-for (const k of Object.keys(SPR)) SPR[k] = outlineOf(SPR[k]);
+for (const k of Object.keys(SPR)) SPR[k] = pixelArt(SPR[k]);
 for (const k of Object.keys(SPR)) { FLASH[k] = flashOf(SPR[k]); TINT[k] = tintOf(SPR[k]); }
 // el cazador aliado: mismo porte, teñido de azul espectral
 const ALLY_SPR = (() => {
@@ -3840,7 +3905,7 @@ function hunterOutfitFrame(outfit, step) {
     g.fillStyle = '#5a4630'; g.fillRect(-13.4, 7, 4.8, 6);
     g.fillStyle = '#ffcf6b'; g.beginPath(); g.arc(-11, 10, 2, 0, TAU); g.fill();
   });
-  return (OUTFIT_CACHE[key] = outlineOf(spr));
+  return (OUTFIT_CACHE[key] = pixelArt(spr, 1.5));
 }
 
 function drawDecor(x0, y0) {
@@ -4027,11 +4092,13 @@ function drawShadow(x, y, r) {
 
 function drawSprite(key, x, y, size, flip, flash, tint) {
   const img = flash ? FLASH[key] : tint ? TINT[key] : SPR[key];
+  const sm = ctx.imageSmoothingEnabled; ctx.imageSmoothingEnabled = false;
   if (flip) {
     ctx.save(); ctx.translate(x, y); ctx.scale(-1, 1);
     ctx.drawImage(img, -size / 2, -size / 2, size, size);
     ctx.restore();
   } else ctx.drawImage(img, x - size / 2, y - size / 2, size, size);
+  ctx.imageSmoothingEnabled = sm;
 }
 
 function render() {
@@ -4246,7 +4313,7 @@ function render() {
   const bob = p.moving ? Math.abs(Math.sin(p.anim)) * -2 : 0;
   for (const gh of G.ghosts) {
     ctx.globalAlpha = clamp(gh.life / 0.22, 0, 1) * 0.35;
-    { const gi = hunterOutfitFrame(p.outfit, 0); ctx.save(); ctx.translate(gh.x, gh.y); if (gh.face < 0) ctx.scale(-1, 1); ctx.drawImage(gi, -31, -31, 62, 62); ctx.restore(); }
+    { const gi = hunterOutfitFrame(p.outfit, 0); ctx.save(); ctx.translate(gh.x, gh.y); if (gh.face < 0) ctx.scale(-1, 1); ctx.imageSmoothingEnabled = false; ctx.drawImage(gi, -31, -31, 62, 62); ctx.restore(); }
   }
   ctx.globalAlpha = 1;
   if (p.beastT > 0) {
@@ -4261,6 +4328,7 @@ function render() {
     const breathe = p.moving ? 1 : 1 + Math.sin(G.t * 2.4) * 0.025;
     ctx.save(); ctx.translate(p.x, p.y + bob); ctx.rotate(p.moving ? p.dirX * 0.06 : 0); ctx.scale(1 / breathe, breathe);
     if (p.face < 0) ctx.scale(-1, 1);
+    ctx.imageSmoothingEnabled = false;
     ctx.drawImage(img, -31, -31, 62, 62);
     ctx.restore();
   }
@@ -4269,8 +4337,8 @@ function render() {
   for (const a of G.allies) {
     drawShadow(a.x, a.y + 4, 12);
     ctx.globalAlpha = a.t < 3 ? 0.4 + 0.4 * Math.abs(Math.sin(G.t * 8)) : 1;
-    if (a.face < 0) { ctx.save(); ctx.translate(a.x, a.y); ctx.scale(-1, 1); ctx.drawImage(ALLY_SPR, -24, -24, 48, 48); ctx.restore(); }
-    else ctx.drawImage(ALLY_SPR, a.x - 24, a.y - 24, 48, 48);
+    if (a.face < 0) { ctx.save(); ctx.translate(a.x, a.y); ctx.scale(-1, 1); ctx.imageSmoothingEnabled = false; ctx.drawImage(ALLY_SPR, -24, -24, 48, 48); ctx.restore(); }
+    else crisp(() => ctx.drawImage(ALLY_SPR, a.x - 24, a.y - 24, 48, 48));
     ctx.globalAlpha = 1;
   }
   // locura (violeta) y veneno (verde) sobre la cabeza
