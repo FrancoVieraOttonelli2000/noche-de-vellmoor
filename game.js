@@ -4936,11 +4936,138 @@ function drawOutfitHead(g, id) {
   }
 }
 
+// ---------------------------------------------------------------- Armas con diseño propio
+// Cada arma se dibuja a lo largo de +x desde la mano (empuñadura en el origen).
+const WPN_DRAW = {
+  // cuchillo de carnicero: hoja ancha y corta con agujero / machete largo con lomo dentado
+  cuchillo: [(g) => {
+    hdPoly(g, [[-4, -0.9], [0, -0.9], [0, 0.9], [-4, 0.9]], '#3a2616', 0.8);
+    g.fillStyle = '#b08a3a'; g.fillRect(-3, -0.9, 0.7, 1.8); g.fillRect(-1.4, -0.9, 0.7, 1.8);
+    hdPoly(g, [[0, -1.2], [10, -1.6], [11.5, 0.2], [11, 3.6], [0, 3.2]], hdLin(g, 0, -1.6, 0, 3.6, ['#eef0f6', '#9aa0ac', '#4a4e5a']), 0.9);
+    hdLine(g, [[0.5, 3], [10.8, 3.4]], '#eef0f6', 0.5);
+    g.fillStyle = '#16141a'; g.beginPath(); g.arc(8.6, 0.4, 0.8, 0, TAU); g.fill();
+  }, (g) => {
+    hdPoly(g, [[-5, -1], [0, -1], [0, 1], [-5, 1]], '#3a2616', 0.8);
+    hdPoly(g, [[0, -1.6], [0, 2], [3, 2.2]], '#6e7480');
+    const pts = [[1, -1.4], [21, -2.4], [24, -0.6], [22, 2.4], [1, 2]];
+    hdPoly(g, pts, hdLin(g, 0, -2.4, 0, 2.4, ['#eef0f6', '#9aa0ac', '#4a4e5a']), 0.9);
+    g.fillStyle = '#4a4e5a'; for (let x = 4; x < 20; x += 2) g.fillRect(x, -2 - (x % 4 ? 0.6 : 0), 1, 0.9);
+    hdLine(g, [[2, 1.7], [22, 2]], '#eef0f6', 0.5);
+  }],
+  // hacha de leñador: corta / asta larga con la cabeza al final
+  hacha: [(g) => {
+    hdLimb(g, [[-3, 0], [12, 0]], hdLin(g, 0, -1, 0, 1, ['#9a7650', '#5c4228']), 1.6);
+    hdPoly(g, [[9, -1.2], [13, -1.2], [15, -4.6], [16.6, -1], [16.6, 3], [15, 6.4], [13, 1.4], [9, 1.2]], hdLin(g, 9, -4, 16, 6, ['#c8ccd6', '#6e7480', '#2a2c34']), 0.9);
+    hdLine(g, [[16.2, -1.5], [16.2, 4.5]], '#eef0f6', 0.6);
+  }, (g) => {
+    hdLimb(g, [[-8, 0], [24, 0]], hdLin(g, 0, -1, 0, 1, ['#9a7650', '#3a2616']), 1.5);
+    g.fillStyle = '#2e2016'; for (const x of [-6, 8, 15]) g.fillRect(x, -1, 1.2, 2);
+    hdPoly(g, [[21, -1.2], [24, -1.2], [26, -5.6], [28, -1], [28, 3], [26, 7], [24, 1.4], [21, 1.2]], hdLin(g, 21, -5, 28, 7, ['#c8ccd6', '#6e7480', '#2a2c34']), 0.9);
+    hdLine(g, [[27.6, -1.5], [27.6, 4.5]], '#eef0f6', 0.6);
+  }],
+  // estoque de plata: hoja fina con guarda de lazo / envainado se vuelve una maza
+  estoque: [(g) => {
+    hdLine(g, [[-3.5, 0], [0, 0]], '#3a2616', 1.6);
+    g.fillStyle = '#c8ccd6'; g.beginPath(); g.arc(-3.8, 0, 1, 0, TAU); g.fill();
+    g.strokeStyle = OL7; g.lineWidth = 1.6; g.beginPath(); g.ellipse(-0.6, 1.4, 2.6, 2.2, 0, 0, TAU); g.stroke();
+    g.strokeStyle = '#c8ccd6'; g.lineWidth = 0.8; g.beginPath(); g.ellipse(-0.6, 1.4, 2.6, 2.2, 0, 0, TAU); g.stroke();
+    hdLine(g, [[0.4, -3], [0.4, 3]], '#9aa0ac', 1.2);
+    hdPoly(g, [[0.6, -0.7], [24, -0.25], [26, 0], [24, 0.25], [0.6, 0.7]], '#c8ccd6', 0.7);
+    hdLine(g, [[1, -0.2], [24, -0.1]], '#eef0f6', 0.4);
+  }, (g) => {
+    hdLine(g, [[-3.5, 0], [0, 0]], '#3a2616', 1.6);
+    hdPoly(g, [[0, -1.8], [13, -1.8], [13, 1.8], [0, 1.8]], hdLin(g, 0, -2, 0, 2, ['#5a4a44', '#1a1416']), 0.9);
+    for (const x of [3, 7, 11]) { g.fillStyle = '#9aa0ac'; g.fillRect(x, -1.8, 0.8, 3.6); }
+    hdPoly(g, [[13, -3.4], [18, -4], [20, 0], [18, 4], [13, 3.4]], hdLin(g, 13, -4, 20, 4, ['#eef0f6', '#9aa0ac', '#4a4e5a']), 1);
+    g.fillStyle = '#6e7480'; for (const y of [-4.6, 3.6]) g.fillRect(14.4, y, 3, 1);
+    g.fillStyle = '#eef0f6'; g.fillRect(14.2, -2.6, 2.4, 0.7);
+  }],
+  // guadaña ritual: hoz curva corta / guadaña completa con asta
+  guadana: [(g) => {
+    hdLimb(g, [[-3, 0], [6, 0]], '#3a2616', 1.5);
+    g.strokeStyle = OL7; g.lineWidth = 3.2; g.beginPath(); g.arc(9.5, -3, 5.6, 2.6, -0.5); g.stroke();
+    g.strokeStyle = '#9aa0ac'; g.lineWidth = 2.2; g.beginPath(); g.arc(9.5, -3, 5.6, 2.6, -0.5); g.stroke();
+    g.strokeStyle = '#eef0f6'; g.lineWidth = 0.6; g.beginPath(); g.arc(9.5, -3, 4.6, 2.8, -0.6); g.stroke();
+    g.fillStyle = '#9a6ad8'; g.fillRect(5.6, -1, 1.2, 1.2);
+  }, (g) => {
+    hdLimb(g, [[-7, 0], [25, 0]], hdLin(g, 0, -1, 0, 1, ['#5c4228', '#1e140e']), 1.5);
+    g.fillStyle = '#9a6ad8'; g.fillRect(9, -0.8, 1.4, 1.6); g.fillRect(-4, -0.8, 1.4, 1.6);
+    const blade = [[23, -1], [25, -2], [22, -9], [15, -14], [8, -15], [14, -11], [19, -6], [22.5, 0]];
+    hdPoly(g, blade, hdLin(g, 8, -15, 25, 0, ['#eef0f6', '#9aa0ac', '#3a2a4a']), 1);
+    hdLine(g, [[8.6, -14.6], [15, -13], [21, -8], [23.6, -2.2]], '#eef0f6', 0.5);
+    g.fillStyle = 'rgba(201,160,255,0.6)'; g.fillRect(17, -9, 1, 1); g.fillRect(13, -12, 1, 1);
+  }],
+  // espadón del eclipse: envainado en funda labrada / hoja ancha que chisporrotea
+  eclipse: [(g) => {
+    hdLine(g, [[-5, 0], [0, 0]], '#1a1416', 2);
+    g.fillStyle = '#d4b05a'; g.beginPath(); g.arc(-5.4, 0, 1.4, 0, TAU); g.fill();
+    hdLine(g, [[0, -4], [0, 4]], '#d4b05a', 1.8);
+    hdPoly(g, [[1, -2], [23, -1.6], [25, 0], [23, 1.6], [1, 2]], hdLin(g, 0, -2, 0, 2, ['#3a3048', '#120e18']), 1);
+    for (const x of [5, 12, 19]) { g.fillStyle = '#d4b05a'; g.fillRect(x, -2, 1.4, 4); g.fillStyle = '#9a6ad8'; g.fillRect(x + 0.3, -0.4, 0.8, 0.8); }
+  }, (g) => {
+    hdLine(g, [[-6, 0], [0, 0]], '#1a1416', 2.2);
+    g.fillStyle = '#d4b05a'; g.beginPath(); g.arc(-6.4, 0, 1.5, 0, TAU); g.fill();
+    hdPoly(g, [[0, -5], [2, -4.6], [2, 4.6], [0, 5]], '#d4b05a', 0.8);
+    hdPoly(g, [[2, -3], [22.5, -2.4], [26, 0], [22.5, 2.4], [2, 3]], hdLin(g, 0, -3, 0, 3, ['#eef0f6', '#9ac0d8', '#4a6a82']), 1);
+    hdLine(g, [[3, 0], [22.5, 0]], '#4a6a82', 0.6);
+    hdLine(g, [[3, -2.4], [22.5, -2]], '#ffffff', 0.5);
+    g.fillStyle = '#9ac0d8'; for (const [x, y] of [[8, -4], [14, 3.6], [19, -3.6], [24, 2.6]]) g.fillRect(x, y, 1, 1);
+  }],
+};
+// pistolas y escopetas
+const GUN_DRAW = {
+  chispa: (g, M) => {
+    hdPoly(g, [[-1, -1], [2, -1.4], [1.5, 1], [-1.6, 4.2], [-3.2, 3.4]], '#3a2616', 0.8);
+    g.fillStyle = '#4a4e5a'; g.fillRect(1, -2.2, 10, 2); g.fillStyle = '#c8ccd6'; g.fillRect(1.5, -2.2, 9, 0.6);
+    g.fillStyle = M[1]; g.fillRect(0.5, -2.6, 2, 3); g.fillRect(10, -2.4, 1, 2.4);
+    g.fillStyle = '#1a161c'; g.fillRect(0, -3.4, 1.4, 1.2);
+  },
+  revolver: (g, M) => {
+    hdPoly(g, [[-0.6, -0.6], [2.4, -0.8], [1.6, 1.4], [-1.2, 4.6], [-3, 3.8]], '#5c4228', 0.8);
+    g.fillStyle = '#07040a'; g.fillRect(1.6, -3.4, 11, 2.8);
+    g.fillStyle = '#c8ccd6'; g.fillRect(2, -3, 10.4, 2); g.fillStyle = '#eef0f6'; g.fillRect(2.4, -3, 10, 0.6);
+    g.fillStyle = '#6e7480'; g.fillRect(2, -4, 4, 4.2); g.fillStyle = '#9aa0ac'; for (const y of [-3.4, -1.8]) g.fillRect(2.4, y, 3.2, 0.6);
+    g.fillStyle = '#d4b05a'; g.fillRect(12, -3.6, 0.8, 0.8);
+  },
+  escopeta: (g, M) => {
+    hdPoly(g, [[-2, -1.6], [2, -2], [2, 1.6], [-1, 5.4], [-3.6, 4.6]], '#5c4228', 0.9);
+    g.fillStyle = '#07040a'; g.fillRect(1.6, -4.2, 10.6, 4.6);
+    g.fillStyle = '#4a4e5a'; g.fillRect(2, -3.8, 10, 1.8); g.fillRect(2, -1.8, 10, 1.8);
+    g.fillStyle = '#c8ccd6'; g.fillRect(2, -3.8, 10, 0.5); g.fillRect(2, -1.8, 10, 0.4);
+    g.fillStyle = '#07040a'; g.fillRect(11.6, -3.4, 0.8, 1); g.fillRect(11.6, -1.4, 0.8, 1);
+    g.fillStyle = M[1]; g.fillRect(1.4, -4.4, 1.6, 5);
+  },
+  carabina: (g, M) => {
+    hdPoly(g, [[-7, -1], [1, -1.6], [2, 1.2], [-6, 3.4], [-8, 2.6]], '#7a5a38', 0.9);
+    g.fillStyle = '#07040a'; g.fillRect(1, -2.8, 19, 2.4);
+    g.fillStyle = '#6e7480'; g.fillRect(1.4, -2.4, 18.4, 1.6); g.fillStyle = '#c8ccd6'; g.fillRect(1.6, -2.4, 18, 0.5);
+    g.fillStyle = '#7a5a38'; g.fillRect(4, -0.8, 10, 1.6);
+    g.strokeStyle = M[1]; g.lineWidth = 0.7; g.beginPath(); g.ellipse(2.4, 1.6, 1.6, 1.4, 0, 0, TAU); g.stroke();
+    g.fillStyle = M[1]; g.fillRect(1, -3.2, 2.4, 3);
+  },
+  eter: (g, M) => {
+    hdPoly(g, [[-1, -1], [2.4, -1.4], [1.6, 1.4], [-1.4, 4.6], [-3.2, 3.8]], '#3a2810', 0.8);
+    g.fillStyle = '#07040a'; g.fillRect(1.4, -4, 12, 4);
+    g.fillStyle = hdLin(g, 0, -4, 0, 0, ['#f0d890', '#8a6424']); g.fillRect(1.8, -3.6, 11.2, 3.2);
+    for (const x of [4, 6.6, 9.2]) { g.fillStyle = '#4a6a82'; g.fillRect(x, -4.2, 1.4, 4.4); g.fillStyle = '#9ac0d8'; g.fillRect(x + 0.3, -3.4, 0.8, 0.8); }
+    g.fillStyle = '#eef0f6'; g.fillRect(13, -2.6, 1.4, 1.2);
+    g.fillStyle = 'rgba(154,192,216,0.8)'; g.fillRect(14.6, -3.4, 1, 1); g.fillRect(15, -1.4, 0.8, 0.8);
+  },
+};
+function hdMelee(g, w, hx, hy, ang) {
+  const d = WPN_DRAW[w.melee] || WPN_DRAW.estoque;
+  g.save(); g.translate(hx, hy); g.rotate(ang); (d[w.form ? 1 : 0] || d[0])(g); g.restore();
+}
+function hdGun(g, w, hx, hy, ang, M) {
+  g.save(); g.translate(hx, hy); g.rotate(ang); (GUN_DRAW[w.gun] || GUN_DRAW.chispa)(g, M); g.restore();
+}
+const WPN_DEFAULT = { melee: 'estoque', form: 0, gun: 'chispa' };
+
 // poses del cazador: idle (4 cuadros), walk (6), slash (3), shoot (1)
 const OUTFIT_CACHE = {};
-const SLASH_POSES = [{ rh: [2, -25], blade: -2.85 }, { rh: [19, -14], blade: -0.2 }, { rh: [16, 1], blade: 0.95 }];
-function hunterOutfitFrame(outfit, pose = 'idle', f = 0) {
-  const key = PIECE_IDS.map(k => outfit[k]).join('|') + '#' + pose + f;
+const SLASH_POSES = [{ rh: [2, -25], blade: -2.85 }, { rh: [15, -14], blade: -0.2 }, { rh: [16, 1], blade: 0.95 }];
+function hunterOutfitFrame(outfit, pose = 'idle', f = 0, wpn = WPN_DEFAULT) {
+  const key = PIECE_IDS.map(k => outfit[k]).join('|') + '#' + pose + f + '#' + wpn.melee + (wpn.form ? 1 : 0) + wpn.gun;
   if (OUTFIT_CACHE[key]) return OUTFIT_CACHE[key];
   let k = 0, sw = 0, bob = 0, lean = 0, lf = 0, lb = 0, rh = [10, 2], ba = 1.15, gun = null;
   if (pose === 'idle') { const ph = (f / 4) * TAU; sw = Math.sin(ph) * 0.8; bob = Math.round(Math.sin(ph) * 0.6 * 2) / 2; rh = [10, 2 + bob * 0.5]; }
@@ -4956,18 +5083,18 @@ function hunterOutfitFrame(outfit, pose = 'idle', f = 0) {
     g.save(); g.translate(0, bob); g.rotate(lean);
     hdCape(g, outfit.torso, sw);
     // brazo de la pistola por detrás (cuando no apunta)
-    if (!gun) { hdArm(g, outfit.brazos, -5, -17, -8, 2, true); hdPistol(g, -8, 2, Math.PI * 0.55, S[outfit.brazos].metal); }
+    if (!gun) { hdArm(g, outfit.brazos, -5, -17, -8, 2, true); hdGun(g, wpn, -8, 2, Math.PI * 0.55, S[outfit.brazos].metal); }
     hdCoatBack(g, outfit.torso, sw);
     g.restore();
     hdLegs(g, outfit.piernas, k, lf, lb);
     g.translate(0, bob); g.rotate(lean);
     hdTorso(g, outfit.torso, sw);
     hdLantern(g);
-    if (gun) { hdArm(g, outfit.brazos, -3, -17, gun[0], gun[1], false); hdPistol(g, gun[0], gun[1], -0.08, S[outfit.brazos].metal); }
+    if (gun) { hdArm(g, outfit.brazos, -3, -17, gun[0], gun[1], false); hdGun(g, wpn, gun[0], gun[1], -0.08, S[outfit.brazos].metal); }
     const blFirst = ba < -1.5; // estoque en alto: la hoja va detrás del brazo
-    if (blFirst) hdBlade(g, rh[0], rh[1], ba, S[outfit.brazos].metal);
+    if (blFirst) hdMelee(g, wpn, rh[0], rh[1], ba);
     hdArm(g, outfit.brazos, 6, -17, rh[0], rh[1], false);
-    if (!blFirst) hdBlade(g, rh[0], rh[1], ba, S[outfit.brazos].metal);
+    if (!blFirst) hdMelee(g, wpn, rh[0], rh[1], ba);
     hdCapelet(g, outfit.torso, sw);
     hdHead(g, outfit.cabeza);
   });
@@ -5411,7 +5538,7 @@ function renderWorld() {
   const bob = p.moving ? Math.abs(Math.sin(p.anim)) * -2 : 0;
   for (const gh of G.ghosts) {
     ctx.globalAlpha = clamp(gh.life / 0.22, 0, 1) * 0.35;
-    { const gi = hunterOutfitFrame(p.outfit, 'walk', 2); ctx.save(); ctx.translate(gh.x, gh.y); if (gh.face < 0) ctx.scale(-1, 1); ctx.imageSmoothingEnabled = false; ctx.drawImage(gi, -40, -46, 80, 80); ctx.restore(); }
+    { const gi = hunterOutfitFrame(p.outfit, 'walk', 2, { melee: p.melee.id, form: p.melee.form || 0, gun: p.gun.id }); ctx.save(); ctx.translate(gh.x, gh.y); if (gh.face < 0) ctx.scale(-1, 1); ctx.imageSmoothingEnabled = false; ctx.drawImage(gi, -40, -46, 80, 80); ctx.restore(); }
   }
   ctx.globalAlpha = 1;
   if (p.beastT > 0) {
@@ -5427,7 +5554,7 @@ function renderWorld() {
     if (sl) { pose = 'slash'; fr = Math.min(2, Math.floor((1 - sl.life / sl.max) * 3)); }
     else if (p.shootT > 0) { pose = 'shoot'; fr = 0; }
     else if (p.moving) { pose = 'walk'; fr = Math.floor(p.anim / 1.1) % 6; }
-    const img = hunterOutfitFrame(p.outfit, pose, fr);
+    const img = hunterOutfitFrame(p.outfit, pose, fr, { melee: p.melee.id, form: p.melee.form || 0, gun: p.gun.id });
     ctx.save(); ctx.translate(Math.round(p.x), Math.round(p.y + bob));
     if (p.face < 0) ctx.scale(-1, 1);
     ctx.imageSmoothingEnabled = false;
