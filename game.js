@@ -684,11 +684,12 @@ const HD_PAL = [
 
 // materiales de cada atuendo: [luz, medio, sombra]
 const HD_STYLE = {
-  viaje:  { coat: ['#8a6a48', '#5e4630', '#30221a'], hem: 14, open: true, vest: ['#6a4630', '#3a2618'], shirt: '#c8b8a0', pants: ['#6a5a48', '#3a3026'], boot: ['#5a4430', '#2a1e14'], bootTop: 25, metal: ['#f0d890', '#b08a3a', '#5e4218'], scarf: ['#a8382c', '#5a1418'], glove: ['#7a5a3a', '#3a2818'], hat: 'cap', capelet: 0, bracer: 'cuero', belts: 'bandolera' },
+  viaje:  { coat: ['#3a3440', '#1a161c', '#07040a'], hem: 0, noCoat: true, open: true, vest: ['#5e3a2e', '#2a1612'], shirt: '#ece4d8', sleeve: ['#f6f0e2', '#c8c2b4', '#8a8478'], pants: ['#3a3634', '#121010'], boot: ['#4a4650', '#07040a'], bootTop: 33.5, metal: ['#f0d890', '#b08a3a', '#5e4218'], scarf: ['#2a2830', '#0e0c10'], glove: ['#d8ccbc', '#8a7a6c'], hat: 'capucha', hood: ['#3a3440', '#1a161c', '#07040a'], chin: true, eye: '#5a4a4a', capelet: 1, capeletCol: ['#3a3440', '#1a161c', '#07040a'], capeletBot: -12.5, capeletW: 9.5, hoodScale: 0.86, bracer: 'venda', belts: 'tirantes' },
   sereno: { coat: ['#7a8694', '#4e5864', '#1e232a'], hem: 30, open: false, vest: ['#3a3e46', '#1e2026'], shirt: '#9aa0a8', pants: ['#44464e', '#1e2026'], boot: ['#363040', '#100c14'], bootTop: 21, metal: ['#f0d890', '#b08a3a', '#5e4218'], scarf: ['#3a3640', '#141218'], glove: ['#2a262e', '#0e0c10'], hat: 'ala', capelet: 2, bracer: null, belts: 'cinto' },
   gaban:  { coat: ['#7e7c88', '#46444c', '#141216'], hem: 32, open: true, vest: ['#5a4030', '#2a1c12'], shirt: '#ece4d8', pants: ['#4e4438', '#221c16'], boot: ['#3a3036', '#0e0c10'], bootTop: 19, metal: ['#fff4c8', '#d4b05a', '#5e4218'], scarf: ['#2a2830', '#0e0c10'], glove: ['#4a382a', '#1e140e'], hat: 'copa', capelet: 1, bracer: 'oro', belts: 'hebillas' },
   habito: { coat: ['#f6f0e2', '#c8c2b4', '#7a7468'], hem: 35, open: false, vest: ['#3a3040', '#1a141e'], shirt: '#e2dccd', pants: ['#a8a294', '#6a645a'], boot: ['#c8c2b4', '#7a7468'], bootTop: 31, metal: ['#f0d890', '#b08a3a', '#5e4218'], scarf: ['#e2dccd', '#8a8478'], glove: ['#e8ccb0', '#9a7460'], hat: 'capucha', capelet: 0, bracer: null, belts: 'cordon' },
   vigia:  { coat: ['#a4a8b4', '#626670', '#24262c'], hem: 12, open: false, vest: ['#4a4e5a', '#24262c'], shirt: '#6e7480', pants: ['#4e505a', '#1e2026'], boot: ['#a4a8b4', '#3a3c44'], bootTop: 20, metal: ['#eef0f6', '#9aa0ac', '#4a4e5a'], scarf: ['#4a4e5a', '#1a1c20'], glove: ['#8a8e98', '#30323a'], hat: 'yelmo', capelet: 0, bracer: 'hierro', belts: 'cinto', cape: 'carmesi' },
+  cazador: { coat: ['#8e8a94', '#57535c', '#1e1c22'], hem: 34, open: true, vest: ['#3a3236', '#141012'], shirt: '#e2dccd', pants: ['#4a4440', '#1a1614'], boot: ['#3e3438', '#0e0a0c'], bootTop: 20, metal: ['#f0d890', '#b08a3a', '#4a3010'], scarf: ['#2a282e', '#0a080c'], glove: ['#3a2c24', '#120c0a'], hat: 'chambergo', capelet: 1, capeletCol: ['#827e88', '#4c4852', '#16141a'], capeletBot: -9, capeletW: 11, bracer: 'oro', belts: 'hebillas', wraps: true },
   velo:   { coat: ['#3a3048', '#1e1828', '#08060c'], hem: 35, open: false, vest: ['#4a2a66', '#1c1028'], shirt: '#2e1a40', pants: ['#221a2a', '#0a080e'], boot: ['#2e2636', '#0a080e'], bootTop: 23, metal: ['#eef0f6', '#9aa0ac', '#4a4e5a'], scarf: ['#1e1828', '#08060c'], glove: ['#1e1828', '#08060c'], hat: 'punta', capelet: 0, bracer: null, belts: 'cinto', cape: 'plumas' },
 };
 
@@ -768,6 +769,7 @@ function hdLeg(g, S, hipX, footX, lift, dark) {
   hdBuckle(g, mid[0] + 1.6, mid[1] + 0.3, S.metal, 0.7);
   hdLine(g, [[ank[0] - 3, ank[1] - 1.8], [ank[0] + 2.6, ank[1] - 1.2]], '#1e140e', 1);
   hdLine(g, [[top[0] - 1.6, top[1] + 1], [ank[0] - 1.8, ank[1] - 2.5]], 'rgba(255,255,255,0.16)', 0.7);
+  if (S.wraps) for (let t = 0.15; t < 0.9; t += 0.2) { const wx = top[0] + (ank[0] - top[0]) * t, wy = top[1] + (ank[1] - top[1]) * t; hdLine(g, [[wx - 3, wy - 1], [wx + 3, wy + 1.2]], '#1e1614', 0.9); hdLine(g, [[wx - 3, wy + 1], [wx + 3, wy - 0.4]], 'rgba(160,140,120,0.35)', 0.5); }
   if (S.bracer === 'hierro') { hdLine(g, [[knee[0] - 2.8, knee[1]], [knee[0] + 2.8, knee[1]]], S.metal[1], 3); g.fillStyle = S.metal[0]; g.fillRect(knee[0] - 2.4, knee[1] - 1.4, 4.8, 0.8); }
 }
 function hdLegs(g, id, k, lf, lb) {
@@ -779,6 +781,7 @@ function hdLegs(g, id, k, lf, lb) {
 // --- torso: chaleco, abrigo, correas, cuello y esclavina
 function hdTorso(g, id, sw) {
   const S = HD_STYLE[id], L = S.hem, C = S.coat, M = S.metal;
+  if (S.noCoat) return hdVestOnly(g, S, sw);
   // camisa y chaleco
   hdPoly(g, [[-6, -19], [7, -19], [6, 4], [-5, 4]], hdLin(g, -6, -19, 6, 4, [S.vest[0], S.vest[1]]));
   // abrigo: panel trasero (lado lejano) y delantero (lado cercano)
@@ -851,9 +854,43 @@ function hdTorso(g, id, sw) {
   hdPoly(g, [[7, -19], [5, -25.5], [2.5, -20]], C[0]);
 }
 
+function hdVestOnly(g, S, sw) {
+  const M = S.metal, V = S.vest, P = S.pants;
+  // camisa blanca de fondo
+  hdPoly(g, [[-6.5, -19], [7.2, -19], [6.6, 4.5], [-5.6, 4.5]], hdLin(g, -6, -19, 7, 4, ['#f6f0e2', '#c8c2b4', '#8a8478']), 1);
+  // cintura del pantalón
+  hdPoly(g, [[-5.8, 2], [6.8, 2], [7, 6.5], [-6, 6.5]], hdLin(g, -6, 0, 7, 0, [P[0], P[1]]));
+  // chaleco a rayas con escote en V y puntas abajo
+  const vest = [[-5.8, -17.5], [-1.4, -18.6], [0.8, -11], [3, -18.6], [7, -17.5], [6.6, 3], [3.8, 5.8], [0.8, 4.2], [-2.2, 5.8], [-5.4, 3]];
+  hdPoly(g, vest, hdLin(g, -6, -18, 7, 5, [V[0], V[1]]), 1);
+  g.save(); g.beginPath(); g.moveTo(vest[0][0], vest[0][1]); for (const p of vest) g.lineTo(p[0], p[1]); g.closePath(); g.clip();
+  for (let x = -5.4; x < 7; x += 1.5) hdLine(g, [[x, -19], [x + 0.3, 6]], 'rgba(200,150,120,0.22)', 0.4);
+  hdLine(g, [[-5, -16], [-4.2, 3]], 'rgba(255,220,190,0.18)', 0.9);
+  hdLine(g, [[5.8, -16], [5.4, 3]], 'rgba(0,0,0,0.35)', 1);
+  g.restore();
+  // botones y bolsillo
+  for (let y = -10; y <= 2; y += 2.6) { g.fillStyle = '#1a0e0a'; g.fillRect(0.4, y, 1.2, 1.2); g.fillStyle = '#8a6a50'; g.fillRect(0.4, y, 0.6, 0.6); }
+  hdLine(g, [[2.8, -5.5], [5.4, -5.8]], '#1a0e0a', 0.8);
+  // cadena del reloj
+  g.strokeStyle = M[1]; g.lineWidth = 0.6; g.beginPath(); g.moveTo(1, -4.6); g.quadraticCurveTo(2.6, -1.4, 4.6, -5.6); g.stroke();
+  g.fillStyle = M[0]; g.fillRect(2.4, -2.4, 0.7, 0.7);
+  // cuello alto de la camisa y lazo oscuro
+  hdPoly(g, [[-2.2, -19], [0.6, -22], [1, -17.4]], '#f6f0e2', 0.7);
+  hdPoly(g, [[3.4, -19], [1, -22], [0.8, -17.4]], '#e2dccd', 0.7);
+  hdPoly(g, [[-0.4, -18], [2, -18], [1.6, -15.6], [0.2, -15.6]], '#1a161c');
+  // tirantes sueltos que cuelgan por los muslos, con hebilla
+  for (const [x, ph] of [[-3.8, 0], [4.4, 1]]) {
+    const ex = x - 1.6 + sw * (0.5 + ph * 0.3), ey = 23 + ph * 1.5;
+    hdLine(g, [[x, 5], [x - 0.4 + sw * 0.2, 13], [ex, ey]], 'rgba(7,4,10,0.85)', 2);
+    hdLine(g, [[x, 5], [x - 0.4 + sw * 0.2, 13], [ex, ey]], '#3a2616', 1.1);
+    hdBuckle(g, x, 6.2, M, 0.75);
+    g.fillStyle = '#2a1a10'; g.fillRect(ex - 0.6, ey, 1.2, 1.6);
+  }
+}
+
 // esclavina por encima de los hombros (1 o 2 niveles)
 function hdCapelet(g, id, sw) {
-  const S = HD_STYLE[id], C = S.coat;
+  const S = HD_STYLE[id], C = S.capeletCol || S.coat;
   if (!S.capelet) return;
   const tier = (top, bot, w, cols) => {
     const pts = [[-w * 0.7, top], [w * 0.75, top], [w + 1 + sw * 0.3, bot - 1]];
@@ -863,7 +900,7 @@ function hdCapelet(g, id, sw) {
     for (const x of [-w * 0.6, -w * 0.15, w * 0.35, w * 0.75]) hdLine(g, [[x * 0.6, top + 2], [x + sw * 0.3, bot]], 'rgba(0,0,0,0.38)', 0.8);
     hdLine(g, [[-w * 0.5, top + 1.5], [-w * 0.8, bot - 1]], 'rgba(255,255,255,0.14)', 0.7);
   };
-  tier(-21, -8, 11, [C[0], C[1], C[2]]);
+  tier(-21, S.capeletBot ?? -8, S.capeletW ?? 11, [C[0], C[1], C[2]]);
   if (S.capelet > 1) tier(-21.5, -13.5, 9.5, [C[0], C[1]]);
   // broche
   g.fillStyle = S.metal[2]; g.beginPath(); g.arc(1, -20, 1.5, 0, TAU); g.fill();
@@ -872,7 +909,7 @@ function hdCapelet(g, id, sw) {
 
 // --- brazo con manga, puño, brazal y guante
 function hdArm(g, id, sx, sy, hx, hy, dark) {
-  const S = HD_STYLE[id], C = S.coat, [ex, ey] = hdElbow(sx, sy, hx, hy);
+  const S = HD_STYLE[id], C = S.sleeve || S.coat, [ex, ey] = hdElbow(sx, sy, hx, hy);
   const sl = dark ? [C[2], C[2]] : [C[0], C[2]];
   g.lineCap = 'round';
   hdLimb(g, [[sx, sy], [ex, ey]], hdLin(g, sx - 3, sy, sx + 3, sy + 4, sl), id === 'habito' ? 6.2 : 5);
@@ -896,6 +933,11 @@ function hdArm(g, id, sx, sy, hx, hy, dark) {
       }
       g.fillStyle = M[2]; g.fillRect(ax - 2.6, ay - 0.4, 0.8, 0.8); g.fillRect(bx + 1.6, by - 0.4, 0.8, 0.8);
     }
+  } else if (S.bracer === 'venda') {
+    // puño arremangado y vendas sucias hasta la muñeca
+    const [ax, ay] = fx(0.1), [bx, by] = fx(0.95);
+    hdLine(g, [[ax, ay], [bx, by]], dark ? '#6a645a' : '#b8ac9a', 4.6);
+    if (!dark) { for (let t = 0.15; t < 0.95; t += 0.16) { const [qx, qy] = fx(t); hdLine(g, [[qx - 2, qy - 1.4], [qx + 2, qy + 1.4]], 'rgba(60,40,30,0.55)', 0.6); } const [rx, ry] = fx(0.05); hdLine(g, [[rx - 2.6, ry - 0.6], [rx + 2.6, ry + 0.6]], '#e2dccd', 1.6); }
   } else if (!dark) {
     const [cx, cy] = fx(0.8); hdLine(g, [[cx - 2.4, cy - 0.8], [cx + 2.2, cy + 0.8]], C[2], 1.5);
   }
@@ -934,9 +976,11 @@ function hdHead(g, id) {
   const hy = -28;
   if (S.headFn) return S.headFn(g, S);
   if (S.hat === 'capucha') {
+    if (S.hoodScale) { g.save(); g.translate(1.5, -24); g.scale(S.hoodScale, S.hoodScale); g.translate(-1.5, 24); HD_STYLE.__capucha = Object.assign({}, S, { hoodScale: 0 }); hdHead(g, '__capucha'); g.restore(); return; }
     hdPoly(g, [[-9, -19], [-9.5, -30], [-5, -37], [2, -38.5], [7.5, -34], [9, -24], [7, -19]], hdLin(g, -9, -38, 9, -19, S.hood || ['#f6f0e2', '#c8c2b4', '#8a8478']), S.hood ? 1 : 0);
     g.fillStyle = '#100c12'; g.beginPath(); g.ellipse(1.6, -28, 4.6, 6, 0.1, 0, TAU); g.fill();
     g.fillStyle = S.eye || '#ffd27a'; g.fillRect(0.4, -29, 1, 0.8); g.fillRect(3, -29, 1, 0.8);
+    if (S.chin) { g.fillStyle = '#b8aca0'; g.beginPath(); g.ellipse(2.6, -24.4, 3.2, 2.4, 0.1, 0, Math.PI); g.fill(); g.fillStyle = '#d8ccbc'; g.fillRect(2.6, -25, 2.4, 1.2); hdLine(g, [[1.8, -23.6], [4.4, -23.8]], '#5a4a44', 0.5); }
     hdLine(g, [[-6, -34], [1, -37], [6.5, -33]], 'rgba(255,255,255,0.4)', 0.7);
     hdLine(g, [[-7, -22], [-6.8, -30]], 'rgba(0,0,0,0.25)', 0.8);
     return;
@@ -979,6 +1023,15 @@ function hdHead(g, id) {
     hdPoly(g, [[-5.5, hy - 5], [-4.8, hy - 10.5], [0.5, hy - 12.5], [5.8, hy - 10.5], [6.4, hy - 5]], hdLin(g, -5, hy - 12, 6, hy - 5, ['#3c4450', '#1a1e26']));
     hdLine(g, [[-5.5, hy - 6.4], [6.4, hy - 6.4]], '#56606c', 1.4);
     hdLine(g, [[-10, hy - 5], [-3, hy - 6]], 'rgba(255,255,255,0.22)', 0.6);
+  } else if (S.hat === 'chambergo') {
+    const brim = [[-11, hy - 2.6], [-7, hy - 5.4], [0, hy - 6.4], [6, hy - 6], [11.5, hy - 3.6], [10, hy - 2.4], [8.5, hy - 3.2], [7, hy - 2], [4, hy - 3.4], [1, hy - 2.6], [-2, hy - 3.6], [-5, hy - 2.2], [-8, hy - 3]];
+    hdPoly(g, brim, hdLin(g, -11, hy - 6, 11, hy - 2, ['#3a3440', '#1a161c', '#07040a']), 1);
+    hdPoly(g, [[-5.4, hy - 5.4], [-5, hy - 11], [-1.5, hy - 13.2], [3, hy - 12.6], [6.4, hy - 10], [6.6, hy - 5.6]], hdLin(g, -5, hy - 13, 6, hy - 5, ['#45414a', '#1e1c22', '#07040a']), 1);
+    hdLine(g, [[-1, hy - 13], [0.6, hy - 9.6]], 'rgba(0,0,0,0.5)', 0.8);
+    hdLine(g, [[-5.2, hy - 6.6], [6.5, hy - 6.8]], '#2e2016', 1.4);
+    g.fillStyle = '#c8ccd6'; g.fillRect(4.6, hy - 7.6, 1, 1.8); g.fillStyle = '#eef0f6'; g.fillRect(4.6, hy - 7.6, 0.6, 0.6);
+    hdLine(g, [[-9, hy - 4], [-4, hy - 5.8]], 'rgba(255,255,255,0.18)', 0.6);
+    g.fillStyle = '#07040a'; for (const x of [-9.5, -3.5, 2.5, 9]) g.fillRect(x, hy - 2.8, 0.8, 1.2);
   } else if (S.hat === 'copa') {
     g.fillStyle = '#07040a'; g.beginPath(); g.ellipse(0.8, hy - 4, 11, 2.6, -0.06, 0, TAU); g.fill();
     hdPoly(g, [[-5, hy - 4.5], [-5.4, hy - 13], [6.8, hy - 13], [6.4, hy - 4.5]], hdLin(g, -5, 0, 7, 0, ['#322c34', '#100c12', '#07040a']));
@@ -1793,6 +1846,7 @@ const ATTIRES = {
   gaban:  { name: 'Gabán de rastreador',      icon: '🎩', rarity: 1, res: { fisico: 14, arcano: 6, abismo: 6 }, speed: 5, desc: 'Liviano y resistente.' },
   habito: { name: 'Hábito de la capilla',     icon: '🥼', rarity: 2, res: { fisico: 10, arcano: 28, abismo: 14 }, regen: 0.3, desc: 'Bendecido por manos piadosas.' },
   vigia:  { name: 'Coraza del vigía de hierro', icon: '🛡️', rarity: 3, res: { fisico: 35, arcano: 12, abismo: 12 }, speed: -6, desc: 'Pesada, pero casi nada la atraviesa.' },
+  cazador: { name: 'Ropa de cazador',        icon: '🗡️', rarity: 3, res: { fisico: 24, arcano: 14, abismo: 16 }, speed: 8, desc: 'Abrigo largo de cuero curtido, esclavina y brazales de latón: hecha para la noche de cacería.' },
   velo:   { name: 'Velo del observatorio',    icon: '🕸️', rarity: 4, res: { fisico: 18, arcano: 35, abismo: 45 }, lucid: 3, desc: 'Tejido por quienes miraron demasiado al cielo.' },
 };
 const RES_LABEL = { fisico: 'física', arcano: 'arcana', abismo: 'abismal' };
@@ -4724,6 +4778,7 @@ const OUTFIT_STYLE = {
   gaban:  { pants: '#3a3228', boot: '#18141a', bootH: 8,  coat: ['#3a383e', '#1a181e'], coatLen: 18, sleeve: '#2e2c32', hand: '#141218' },
   habito: { pants: '#8a847a', boot: '#bdb6a8', bootH: 3,  coat: ['#d4cebf', '#9a9488'], coatLen: 19, sleeve: '#c8c2b4', hand: '#d8c6ad' },
   vigia:  { pants: '#3a3a42', boot: '#5a5a62', bootH: 7,  coat: ['#6a6a74', '#34343c'], coatLen: 13, sleeve: '#5a5a64', hand: '#4a4a52' },
+  cazador: { pants: '#2e2a26', boot: '#14100e', bootH: 9, coat: ['#4a4648', '#1e1c1e'], coatLen: 20, sleeve: '#2e2c30', hand: '#2a1e16' },
   velo:   { pants: '#141018', boot: '#1e1a24', bootH: 6,  coat: ['#1e1828', '#0a0810'], coatLen: 20, sleeve: '#181422', hand: '#120e16' },
 };
 
@@ -4893,7 +4948,7 @@ function hunterOutfitFrame(outfit, pose = 'idle', f = 0) {
     const ph = (f / 6) * TAU; k = Math.sin(ph); sw = -k * 2.4; bob = -Math.abs(Math.cos(ph)) * 1.2 + 0.6;
     lf = Math.max(0, Math.cos(ph)) * 3; lb = Math.max(0, -Math.cos(ph)) * 3;
     rh = [10 - k * 2, 2 + k * 0.8]; ba = 1.1 - k * 0.15;
-  } else if (pose === 'slash') { const P = SLASH_POSES[f]; rh = P.rh; ba = P.blade; sw = [-1.8, 3, 2][f]; lean = [-0.07, 0.12, 0.06][f]; k = [-0.3, 0.5, 0.4][f]; }
+  } else if (pose === 'slash') { f = clamp(f | 0, 0, 2); const P = SLASH_POSES[f]; rh = P.rh; ba = P.blade; sw = [-1.8, 3, 2][f]; lean = [-0.07, 0.12, 0.06][f]; k = [-0.3, 0.5, 0.4][f]; }
   else if (pose === 'shoot') { gun = [17, -15]; lean = -0.05; sw = -1; }
   const S = HD_STYLE;
   const spr = makeSprite(80, g => {
